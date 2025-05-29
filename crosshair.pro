@@ -7,21 +7,35 @@ QT += gui
 
 CONFIG += c++2a
 
+debug {
+    message("debug build")
+    CONFIG += console
+}
+
+release {
+    message("release build")
+    QMAKE_LFLAGS += -mwindows
+}
+
 INCLUDEPATH += src/
 
-QMAKE_LFLAGS += -static
-QMAKE_LFLAGS += -mwindows
+QMAKE_LFLAGS += \
+    -static
 
 
 SOURCES += \
-    src/gui/gui.cpp \
-    src/main.cpp 
+    src/main.cpp \
+    src/crosshair/crosshair.cpp \
+    src/crosshair/manager.cpp \
+    src/gui/gui.cpp
 
 
 HEADERS += \
-    src/gui/gui.h
+    src/crosshair/crosshair.h \
+    src/crosshair/manager.h \
+    src/gui/gui.h \
+    src/utils/vector2i.h
 
 
 FORMS += \
     src/gui/gui.ui
-
