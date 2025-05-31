@@ -1,7 +1,5 @@
 #pragma once
 
-#include <mutex>
-#include <memory>
 #include "crosshair.h"
 
 
@@ -19,15 +17,20 @@ public:
     bool isVisible() const;
     void setVisible(bool state = true);
 
+    bool isVisibleInAds() const;
+    void setVisibleInAds(bool state = true);
+    
+    bool isEnabled() const;
+    void setEnabled(bool state = true);
+
     bool render();
 
 private:
-    static constexpr char* WINDOW_CLASS_NAME = "wnd";
-    static constexpr char* WINDOW_NAME = "wnd";
-
     void* hwnd_;
     Crosshair crosshair_;
     bool isVisible_ = false;
+    bool isEnabled_ = false;
+    bool isVisibleInAds_ = false;
 
 private:
     void initWindow();

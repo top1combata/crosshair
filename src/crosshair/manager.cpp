@@ -1,5 +1,6 @@
 #include "manager.h"
 
+#include <utils/constants.h>
 #include <windows.h>
 
 
@@ -20,7 +21,7 @@ CrosshairManager::CrosshairManager() {
 
 CrosshairManager::~CrosshairManager() {
     DestroyWindow(static_cast<HWND>(hwnd_));
-    UnregisterClassA(WINDOW_CLASS_NAME, GetModuleHandleA(NULL));
+    UnregisterClassA(Constants::WINDOW_CLASS_NAME, GetModuleHandleA(NULL));
 }
 
 
@@ -28,7 +29,7 @@ LRESULT WINAPI windowProcedure(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam
 
 void CrosshairManager::initWindow() {
     WNDCLASSA windowClass = {};
-    windowClass.lpszClassName = WINDOW_CLASS_NAME;
+    windowClass.lpszClassName = Constants::WINDOW_CLASS_NAME;
     windowClass.hInstance = GetModuleHandleA(NULL);
     windowClass.lpfnWndProc = &windowProcedure;
 
@@ -38,7 +39,7 @@ void CrosshairManager::initWindow() {
 
     hwnd_ = CreateWindowExA(
         WS_EX_LAYERED | WS_EX_TOPMOST | WS_EX_TOOLWINDOW | WS_EX_TRANSPARENT,
-        WINDOW_CLASS_NAME, WINDOW_NAME,
+        Constants::WINDOW_CLASS_NAME, Constants::WINDOW_NAME,
         WS_POPUP,
         0, 0, GetSystemMetrics(SM_CXSCREEN), GetSystemMetrics(SM_CYSCREEN),
         NULL, NULL, GetModuleHandleA(NULL),
@@ -64,6 +65,11 @@ bool CrosshairManager::render() {
         TranslateMessage(&msg);
         DispatchMessage(&msg);
     }
+
+    if (!isVisibleInAds()) {
+        setVisible(GetAsyncKeyState(VK_RBUTTON) >= 0);
+    }
+
     return true;
 }
 
@@ -75,6 +81,7 @@ void CrosshairManager::redraw() {
 
 void CrosshairManager::setCrosshair(const Crosshair& crosshair) {
     crosshair_ = crosshair;
+    redraw();
 }
 
 
@@ -91,6 +98,32 @@ bool CrosshairManager::isVisible() const {
 void CrosshairManager::setVisible(bool state) {
     if (state != isVisible_) {
         isVisible_ = state;
+        redraw();
+    }
+}
+
+
+bool CrosshairManager::isVisibleInAds() const {
+    return isVisibleInAds_;
+}
+
+
+void CrosshairManager::setVisibleInAds(bool state) {
+    if (state != isVisibleInAds_) {
+        isVisibleInAds_ = state;
+        redraw();
+    }
+}
+
+
+bool CrosshairManager::isEnabled() const {
+    return isEnabled_;
+}
+
+
+void CrosshairManager::setEnabled(bool state) {
+    if (state != isEnabled_) {
+        isEnabled_ = state;
         redraw();
     }
 }
@@ -120,7 +153,7 @@ LRESULT WINAPI windowProcedure(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam
                 *reinterpret_cast<CrosshairManager*>(GetWindowLongPtrA(hwnd, GWLP_USERDATA))
             );
 
-            if (crosshairManager.isVisible()) {
+            if (crosshairManager.isEnabled() && crosshairManager.isVisible()) {
                 Vector2i screenCenter = {
                     GetSystemMetrics(SM_CXSCREEN) / 2,
                     GetSystemMetrics(SM_CYSCREEN) / 2

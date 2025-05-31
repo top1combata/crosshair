@@ -1,7 +1,7 @@
 #pragma once
 
+#include <crosshair/manager.h>
 #include <QMainWindow>
-#include "crosshair/manager.h"
 
 
 namespace Ui {
@@ -19,4 +19,8 @@ public:
 private:
     Ui::CrosshairGui* gui_;
     CrosshairManager crosshairManager_;
+    CrosshairProperties crosshairProperties_ = {};
+
+private:
+    void initWidgets();
 };
